@@ -154,7 +154,34 @@ theorem InP.union {L₁ L₂ : Language} (h₁ : InP L₁) (h₂ : InP L₂) :
 
 补运算的封闭性在标准理论中对应「P 对补封闭」，而 NP 是否对补封闭（即 NP = coNP 是否成立）至今未知——这恰好是 P vs NP 问题旁边另一个仍然开放的分离问题。本文的形式化因此也能作为一个对照：同样的机器模型，补封闭在 P 上是一行构造，在 NP 上就无从下手。
 
-### 3.4 定理清单与审计
+### 3.4 P ⊆ EXP 与 P ⊆ coNP
+
+**定理 5.** 若 `L ∈ P`，则 `L ∈ EXP`。
+
+证明只需一步算术：`m ≤ 2 ^ m` 对一切自然数 `m` 成立，于是多项式界 `c * (|x| + 1)^k` 直接落在指数界 `2 ^ (c * (|x| + 1)^k)` 之内，同一个机器与同一个步数计数器同时是指数时间的。
+
+```lean
+theorem P_subset_EXP {L : Language} (h : InP L) : InEXP L := by
+  obtain ⟨M, htime, hdec⟩ := h
+  obtain ⟨k, c, hb⟩ := htime
+  refine ⟨M, ⟨k, c, ?_⟩, hdec⟩
+  intro x
+  have h₁ : M.steps x ≤ c * (x.length + 1) ^ k := hb x
+  have h₂ : c * (x.length + 1) ^ k ≤ 2 ^ (c * (x.length + 1) ^ k) :=
+    Nat.le_of_lt Nat.lt_two_pow_self
+  exact Nat.le_trans h₁ h₂
+```
+
+**定理 6.** 若 `L ∈ P`，则 `L ∈ coNP`。由 `P ⊆ NP` 与 `P` 对补封闭复合得到，一行证明。
+
+```lean
+theorem P_subset_coNP {L : Language} (h : InP L) : IncoNP L :=
+  P_subset_NP (InP.compl h)
+```
+
+到这里可以无条件写下 `P ⊆ NP ∩ coNP` 与 `P ⊆ EXP`。必须强调：这些全部是**包含**，不是**分离**。目前能无条件写下的真分离只有 `P ⊊ EXP`（时间层次定理），而它依赖通用模拟与对角线构造，尚未在本库中形式化——这也正说明"包含链很长、分离一步都难"。
+
+### 3.5 定理清单与审计
 
 | 编号 | 定理（Lean 名） | 内容 | 依赖公理 |
 |---|---|---|---|
@@ -164,6 +191,9 @@ theorem InP.union {L₁ L₂ : Language} (h₁ : InP L₁) (h₂ : InP L₂) :
 | 4 | `InP.union` | P 对并封闭 | propext, Quot.sound |
 | 5 | `InP.inter` | P 对交封闭 | propext, Quot.sound |
 | 6 | `InP.empty` / `InP.univ` | 空语言与全语言属于 P | propext, Quot.sound |
+| 7 | `P_subset_EXP` | P ⊆ EXP | 无 |
+| 8 | `InEXP.compl` | EXP 对补封闭 | propext |
+| 9 | `P_subset_coNP` | P ⊆ coNP | propext, Quot.sound |
 
 审计命令与真实输出：
 
@@ -172,6 +202,8 @@ $ lake env lean Audit.lean
 'Complexity.P_subset_NP' depends on axioms: [propext, Quot.sound]
 'Complexity.InP.compl' depends on axioms: [propext]
 'Complexity.InP.union' depends on axioms: [propext, Quot.sound]
+'Complexity.P_subset_EXP' does not depend on any axioms
+'Complexity.P_subset_coNP' depends on axioms: [propext, Quot.sound]
 ```
 
 `propext` 与 `Quot.sound` 是 Lean 内核的标准公理，任何使用命题外延性或商类型的证明都会带上它们，它们与"存在一个 P = NP 的证明"毫无关系。关键在于输出中**没有** `sorryAx`，也**没有**任何本文自定义的公理。
@@ -223,7 +255,7 @@ Aaronson 与 Wigderson（2008）进一步指出：把证明"代数化"（允许�
 
 ## 7. 结论
 
-P = NP 没有被证明，也没有被反驳。本文在这个前提下做了能做的事：在 Lean 4 中建立一个可审计的复杂性类框架，机器检查地证明 P ⊆ NP 与 P 的补、并、交封闭，并用 `#print axioms` 证明这些结论不依赖任何可疑假设。对于"用 Lean 证明 P = NP"这一要求，正确的回答不是交付一个带 `sorry` 的文件，而是把边界画清楚：**能证的已经证了，不能证的仍然是千禧年难题。**
+P = NP 没有被证明，也没有被反驳。本文在这个前提下做了能做的事：在 Lean 4 中建立一个可审计的复杂性类框架，机器检查地证明 P ⊆ NP、P ⊆ EXP、P ⊆ coNP 与 P 的补、并、交封闭，并用 `#print axioms` 证明这些结论不依赖任何可疑假设。对于"用 Lean 证明 P = NP"这一要求，正确的回答不是交付一个带 `sorry` 的文件，而是把边界画清楚：**能证的已经证了，不能证的仍然是千禧年难题。**
 
 ---
 
