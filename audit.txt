@@ -1,0 +1,7 @@
+'Complexity.P_subset_NP' depends on axioms: [propext, Quot.sound]
+'Complexity.InP.compl' depends on axioms: [propext]
+'Complexity.InP.union' depends on axioms: [propext, Quot.sound]
+'Complexity.InP.inter' depends on axioms: [propext, Quot.sound]
+'Complexity.PolyBounded.add' depends on axioms: [propext, Quot.sound]
+'Complexity.InP.empty' depends on axioms: [propext, Quot.sound]
+'Complexity.InP.univ' depends on axioms: [propext, Quot.sound]

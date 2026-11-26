@@ -1,0 +1,6 @@
+name = "pnp"
+version = "0.1.0"
+defaultTargets = ["Complexity"]
+
+[[lean_lib]]
+name = "Complexity"
