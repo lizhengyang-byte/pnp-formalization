@@ -6,8 +6,9 @@ import Complexity.Basic
   The classes `P` and `NP` over the abstract machine model of `Complexity.Basic`,
   together with the basic theorems that are actually known:
 
-  * `P ⊆ NP`
+  * `P ⊆ NP`, `P ⊆ EXP`, `P ⊆ coNP`
   * `P` is closed under complement, union and intersection
+  * `EXP` is closed under complement
 
   There is **no** theorem in this file asserting `P = NP`; such a proof does not
   exist today, and this library does not pretend otherwise.
@@ -112,5 +113,51 @@ theorem InP.univ : InP ⟨fun _ => True⟩ :=
     intro x
     show (true = true) ↔ (⟨fun _ => True⟩ : Language).mem x
     simp⟩
+
+/-- `L ∈ EXP` if some exponential-time machine decides `L`. -/
+def InEXP (L : Language) : Prop :=
+  ∃ M : Machine, M.ExpTime ∧ ∀ x : Word, Machine.Accepts M x ↔ x ∈ L
+
+/-- `L ∈ coNP` if its complement is in `NP`. -/
+def IncoNP (L : Language) : Prop := InNP (compl L)
+
+/-- The decision procedure for the complement of a machine's language. -/
+theorem complement_machine_decides {M : Machine} {L : Language}
+    (h : ∀ x : Word, Machine.Accepts M x ↔ x ∈ L) :
+    ∀ x : Word, Machine.Accepts ⟨fun y => !M.accept y, M.steps⟩ x ↔ x ∈ compl L := by
+  intro x
+  have hx : (M.accept x = true) ↔ x ∈ L := h x
+  show (!M.accept x = true) ↔ (⟨fun y => ¬ y ∈ L⟩ : Language).mem x
+  cases hb : M.accept x
+  · have hnot : ¬ x ∈ L := by
+      intro hL
+      have hacc : M.accept x = true := hx.mpr hL
+      rw [hb] at hacc
+      exact Bool.noConfusion hacc
+    simp [hb, hnot]
+  · have hyes : x ∈ L := hx.mp hb
+    simp [hb, hyes]
+
+/-- **P ⊆ EXP.** A polynomial bound is in particular an exponential bound,
+since `m ≤ 2 ^ m` for every `m`. -/
+theorem P_subset_EXP {L : Language} (h : InP L) : InEXP L := by
+  obtain ⟨M, htime, hdec⟩ := h
+  obtain ⟨k, c, hb⟩ := htime
+  refine ⟨M, ⟨k, c, ?_⟩, hdec⟩
+  intro x
+  have h₁ : M.steps x ≤ c * (x.length + 1) ^ k := hb x
+  have h₂ : c * (x.length + 1) ^ k ≤ 2 ^ (c * (x.length + 1) ^ k) :=
+    Nat.le_of_lt Nat.lt_two_pow_self
+  exact Nat.le_trans h₁ h₂
+
+/-- `EXP` is closed under complement, with the same step counter. -/
+theorem InEXP.compl {L : Language} (h : InEXP L) : InEXP (compl L) := by
+  obtain ⟨M, htime, hdec⟩ := h
+  exact ⟨⟨fun y => !M.accept y, M.steps⟩, htime,
+    complement_machine_decides hdec⟩
+
+/-- **P ⊆ coNP.** Follows from `P ⊆ NP` and closure of `P` under complement. -/
+theorem P_subset_coNP {L : Language} (h : InP L) : IncoNP L :=
+  P_subset_NP (InP.compl h)
 
 end Complexity

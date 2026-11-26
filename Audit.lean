@@ -7,3 +7,6 @@ import Complexity
 #print axioms Complexity.PolyBounded.add
 #print axioms Complexity.InP.empty
 #print axioms Complexity.InP.univ
+#print axioms Complexity.P_subset_EXP
+#print axioms Complexity.InEXP.compl
+#print axioms Complexity.P_subset_coNP

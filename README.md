@@ -16,6 +16,9 @@ Lean 4, plus a paper that explains why the open part is still open.
 | 4 | `Complexity.InP.union` | `P` is closed under union |
 | 5 | `Complexity.InP.inter` | `P` is closed under intersection |
 | 6 | `Complexity.InP.empty` / `Complexity.InP.univ` | the empty and universal languages are in `P` |
+| 7 | `Complexity.P_subset_EXP` | `L ∈ P → L ∈ EXP` (no axioms at all) |
+| 8 | `Complexity.InEXP.compl` | `EXP` is closed under complement |
+| 9 | `Complexity.P_subset_coNP` | `L ∈ P → L ∈ coNP` |
 
 All proofs are checked by Lean 4.36.0 and audited with `#print axioms`. The only axioms
 they depend on are Lean's standard `propext` and `Quot.sound`. There is no `sorry`, no
@@ -30,6 +33,9 @@ $ lake env lean Audit.lean
 'Complexity.PolyBounded.add' depends on axioms: [propext, Quot.sound]
 'Complexity.InP.empty' depends on axioms: [propext, Quot.sound]
 'Complexity.InP.univ' depends on axioms: [propext, Quot.sound]
+'Complexity.P_subset_EXP' does not depend on any axioms
+'Complexity.InEXP.compl' depends on axioms: [propext]
+'Complexity.P_subset_coNP' depends on axioms: [propext, Quot.sound]
 ```
 
 ## Model
@@ -43,6 +49,8 @@ bound is `∃ k c, ∀ n, f n ≤ c * (n + 1) ^ k`.
 * `Verifier` — `verify : Word → Word → Bool`, `steps : Word → Word → Nat`
 * `InP L` — some polynomial-time machine decides `L`
 * `InNP L` — some polynomial-time verifier accepts exactly `L` with polynomially bounded certificates
+* `InEXP L` — some exponential-time machine decides `L`
+* `IncoNP L` — the complement of `L` is in `NP`
 
 ## Build
 
@@ -56,8 +64,8 @@ lake env lean Audit.lean
 
 ```
 Complexity.lean          -- library root
-Complexity/Basic.lean    -- words, languages, machines, polynomial bounds
-Complexity/Classes.lean  -- InP, InNP, P ⊆ NP, closure properties
+Complexity/Basic.lean    -- words, languages, machines, polynomial and exponential bounds
+Complexity/Classes.lean  -- InP, InNP, InEXP, IncoNP, inclusions and closure properties
 Audit.lean               -- #print axioms audit
 paper/                   -- "P 与 NP 的形式化地基" (Markdown + PDF)
 ```

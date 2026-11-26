@@ -64,6 +64,11 @@ def PolyTime (V : Verifier) : Prop :=
 
 end Verifier
 
+/-- `M` runs in exponential time: there are `k, c` such that on every input `x`
+the step count is at most `2 ^ (c * (|x| + 1)^k)`. -/
+def Machine.ExpTime (M : Machine) : Prop :=
+  ∃ k c : Nat, ∀ x : Word, M.steps x ≤ 2 ^ (c * (x.length + 1) ^ k)
+
 /-- `f` is bounded by a polynomial: `f n ≤ c * (n + 1)^k` for some `k, c`. -/
 def PolyBounded (f : Nat → Nat) : Prop :=
   ∃ k c : Nat, ∀ n, f n ≤ c * (n + 1) ^ k

@@ -5,3 +5,6 @@
 'Complexity.PolyBounded.add' depends on axioms: [propext, Quot.sound]
 'Complexity.InP.empty' depends on axioms: [propext, Quot.sound]
 'Complexity.InP.univ' depends on axioms: [propext, Quot.sound]
+'Complexity.P_subset_EXP' does not depend on any axioms
+'Complexity.InEXP.compl' depends on axioms: [propext]
+'Complexity.P_subset_coNP' depends on axioms: [propext, Quot.sound]
