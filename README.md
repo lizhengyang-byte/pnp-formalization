@@ -72,9 +72,16 @@ paper/                   -- "P 与 NP 的形式化地基" (Markdown + PDF)
 
 ## Paper
 
-`paper/pnp-formalization.pdf` — *P 与 NP 的形式化地基：一个 Lean 4 中可机器验证的复杂性类框架，
+`paper/pnp-formalization.md` — *P 与 NP 的形式化地基：一个 Lean 4 中可机器验证的复杂性类框架，
 兼论「P = NP」为何仍然悬而未决*. It states the open status up front, walks through the
 formalization, and surveys the relativization, natural-proofs and algebrization barriers.
+
+Render it to PDF:
+
+```bash
+pandoc paper/pnp-formalization.md -o paper/pnp-formalization.pdf --pdf-engine=xelatex \
+  -V mainfont="DejaVu Serif" -V monofont="DejaVu Sans Mono" -V CJKmainfont="AR PL UKai CN"
+```
 
 ## Why no proof of P = NP
 
